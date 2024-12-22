@@ -40,8 +40,49 @@ function canGenPoints(){
 function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
-
 	let gain = new Decimal(1)
+	if (hasUpgrade("p",12) == true){
+		gain = Decimal.mul(gain,player.points.add(1).tetrate(new Decimal(0.1).add(getTetratoEffect(player.p.tetrato))))
+	}
+	if (hasUpgrade("p",13) == true){
+		gain = Decimal.mul(gain,player.points.add(1).tetrate(new Decimal(0.1).add(getTetratoEffect(player.p.tetrato))))
+	}
+	if (hasUpgrade("p",11) == true){
+		gain = Decimal.pow(10,gain)
+	}
+	if (gain.gte(1e9)){
+		gain = gain.log(10).mul(1e9)
+	}
+	if (hasUpgrade("p",21) == true){
+		gain = Decimal.mul(gain,player.p.points)
+	}
+	if (gain.gte(1e100)){
+		gain = gain.log(10).pow(50)
+	}
+	if (gain.gte("e1000")){
+		gain = gain.log(10).pow(500)
+	}
+	if (hasUpgrade("p",25) == true){
+		gain = gain.times(player.p.tetrato)
+	}
+	if (hasUpgrade("p",33) == true){
+		gain = gain.times(player.p.tetrato.pow(-0.5))
+	}
+	return gain
+}
+
+function getTetratoGain(){
+	gain = new Decimal(1)
+	if (hasUpgrade("p",23) == true){
+		gain = gain.times(player.points.add(1).log(10))
+	}
+	if (hasUpgrade("p",24) == true){
+		gain = gain.times(player.points.add(1).log(10).pow(3))
+	}
+	if (hasUpgrade("p",31) == true){
+		gain = gain.pow(player.points.add(1).log(10).add(1).log(10))
+	}
+	gain = gain.pow(new Decimal(player.p.buyables['11']*0.1+1))
 	return gain
 }
 
@@ -50,12 +91,26 @@ function addedPlayerData() { return {
 }}
 
 // Display extra things at the top of the page
+
+function getTetratoEffect(t){
+	let effect = t.add(1).slog(2).pow(2).times(0.01)
+	if (hasUpgrade("p",33) == true){
+		effect = effect.times(5)
+	}
+	if (hasUpgrade("p",34) == true){
+		effect = effect.times(player.p.buyables['11'].slog(10).div(5).add(1))
+	}
+	return effect
+}
 var displayThings = [
+	function(){if (hasUpgrade("p",22) == true){
+		return format(player.p.tetrato) + " tetrato -> +" + format(getTetratoEffect(player.p.tetrato)) + " tetration"
+	}}
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return player.points.gte(new Decimal("1F10"))
 }
 
 

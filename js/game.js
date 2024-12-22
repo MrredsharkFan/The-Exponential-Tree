@@ -344,6 +344,9 @@ function gameLoop(diff) {
 	}
 	addTime(diff)
 	player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
+	if (hasUpgrade("p",22)==true){
+		player.p.tetrato = player.p.tetrato.add(new Decimal(diff).times(getTetratoGain()))
+	}
 
 	for (let x = 0; x <= maxRow; x++){
 		for (item in TREE_LAYERS[x]) {
